@@ -151,7 +151,7 @@ void D3D11Renderer::SetupRenderGraph()
 
 			m_context->OMSetRenderTargets(2, gbuffers, nullptr);
 
-			UINT stride = sizeof(float) * 6;
+			UINT stride = sizeof(Vertex);
 			UINT offset = 0;
 			ID3D11Buffer* vb = m_vertexBuffer.Get();
 
@@ -233,8 +233,8 @@ bool D3D11Renderer::LoadShaders()
 
 	// input layout
 	D3D11_INPUT_ELEMENT_DESC layout[] = {
-		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0,                              D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT, 0, sizeof(Vertex),             D3D11_INPUT_PER_VERTEX_DATA, 0 },
+	{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0,                        D3D11_INPUT_PER_VERTEX_DATA, 0 },
+	{ "NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT, 0, sizeof(DirectX::XMFLOAT3), D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
 
 	m_device->CreateInputLayout(
@@ -251,9 +251,9 @@ bool D3D11Renderer::LoadShaders()
 bool D3D11Renderer::CreateTriangleGeometry()
 {
 	Vertex vertices[] = {
-	{ { 0.0f,  0.5f, 0.0f }, { 0, 0, -1 } },
-	{ { 0.5f, -0.5f, 0.0f }, { 0, 0, -1 } },
-	{ { -0.5f, -0.5f, 0.0f }, { 0, 0, -1 } }
+		{ {  0.0f,  0.5f, 0.0f }, { 0.0f, 0.0f, -1.0f } },
+		{ {  0.5f, -0.5f, 0.0f }, { 0.0f, 0.0f, -1.0f } },
+		{ { -0.5f, -0.5f, 0.0f }, { 0.0f, 0.0f, -1.0f } },
 	};
 
 	D3D11_BUFFER_DESC desc = {};
