@@ -15,6 +15,7 @@ Window::~Window()
 	{
 		LOG_WINDOW_INFO("Destroying window");
 		DestroyWindow(m_hWnd);
+		UnregisterClass(WINDOW_CLASS_NAME, m_instanceHandle);
 	}
 }
 

@@ -13,30 +13,69 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\application">
+      <UniqueIdentifier>{7d74b5d9-cf0e-4a3e-9add-f164809ec412}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\render">
+      <UniqueIdentifier>{9150bb6e-68fb-4a4b-b277-ce781ca19403}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\utils">
+      <UniqueIdentifier>{2f2f338c-43ca-4375-a535-2e4f0fa2bfc2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\window">
+      <UniqueIdentifier>{12631379-87be-4047-8982-b6e1a1106fc0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\render\graph">
+      <UniqueIdentifier>{1d13a1d6-0949-4a02-b9bc-25f62a28c708}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\render\dx11">
+      <UniqueIdentifier>{cba4181d-ffdb-43a9-835a-ec0b9a3f49a1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\render\context">
+      <UniqueIdentifier>{71af8d36-2699-4c46-9936-170146c58931}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\window\window.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\application\application.cpp">
+      <Filter>Source Files\application</Filter>
     </ClCompile>
     <ClCompile Include="src\utils\errors.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\utils</Filter>
     </ClCompile>
-    <ClCompile Include="src\application\application.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\window\window.cpp">
+      <Filter>Source Files\window</Filter>
+    </ClCompile>
+    <ClCompile Include="src\render\graph\render_graph.cpp">
+      <Filter>Source Files\render\graph</Filter>
+    </ClCompile>
+    <ClCompile Include="src\render\dx11\d3d11_renderer.cpp">
+      <Filter>Source Files\render\dx11</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\window\window.h">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="src\application\application.h">
+      <Filter>Source Files\application</Filter>
     </ClInclude>
     <ClInclude Include="src\utils\errors.h">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\utils</Filter>
     </ClInclude>
-    <ClInclude Include="src\application\application.h">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="src\window\window.h">
+      <Filter>Source Files\window</Filter>
+    </ClInclude>
+    <ClInclude Include="src\render\renderer.h">
+      <Filter>Source Files\render</Filter>
+    </ClInclude>
+    <ClInclude Include="src\render\graph\render_graph.h">
+      <Filter>Source Files\render\graph</Filter>
+    </ClInclude>
+    <ClInclude Include="src\render\dx11\d3d11_renderer.h">
+      <Filter>Source Files\render\dx11</Filter>
+    </ClInclude>
+    <ClInclude Include="src\render\context\frame_render_context.h">
+      <Filter>Source Files\render\context</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

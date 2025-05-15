@@ -21,11 +21,17 @@
   <ItemGroup>
     <ClCompile Include="src\application\application.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\render\dx11\d3d11_renderer.cpp" />
+    <ClCompile Include="src\render\graph\render_graph.cpp" />
     <ClCompile Include="src\utils\errors.cpp" />
     <ClCompile Include="src\window\window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\application\application.h" />
+    <ClInclude Include="src\render\context\frame_render_context.h" />
+    <ClInclude Include="src\render\dx11\d3d11_renderer.h" />
+    <ClInclude Include="src\render\graph\render_graph.h" />
+    <ClInclude Include="src\render\renderer.h" />
     <ClInclude Include="src\utils\errors.h" />
     <ClInclude Include="src\window\window.h" />
   </ItemGroup>
