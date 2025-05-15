@@ -49,13 +49,22 @@ int Application::Run()
 		frameContext.windowWidth = m_window->GetWidth();
 		frameContext.windowHeight = m_window->GetHeight();
 
-		if (m_renderer)
-		{
-			m_renderer->RenderFrame(frameContext);
-		}
-
-		// future: Update();
+		Update(dt);
+		Render(frameContext);
 	}
 
 	return 0;
+}
+
+void Application::Update(float dt)
+{
+	/// stub
+}
+
+void Application::Render(const FrameRenderContext& context)
+{
+	if (m_renderer)
+	{
+		m_renderer->RenderFrame(context);
+	}
 }

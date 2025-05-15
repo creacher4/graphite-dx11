@@ -119,11 +119,10 @@ void D3D11Renderer::SetupRenderGraph()
 	RenderPass clearPass;
 	clearPass.name = "ClearBackBuffer";
 
-	clearPass.execute = [this](const FrameRenderContext&)
+	clearPass.execute = [this](const FrameRenderContext& context)
 	{
-		float clearColor[4] = { 0.1f, 0.1f, 0.3f, 1.0f };
 		m_context->OMSetRenderTargets(1, m_rtv.GetAddressOf(), nullptr);
-		m_context->ClearRenderTargetView(m_rtv.Get(), clearColor);
+		m_context->ClearRenderTargetView(m_rtv.Get(), context.clearColor);
 	};
 
 	clearPass.outputResources = {

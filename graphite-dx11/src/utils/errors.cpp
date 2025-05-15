@@ -65,9 +65,7 @@ void d3d::LogIfFailed(HRESULT hr, const char* context)
 {
 	if (SUCCEEDED(hr)) return;
 
-	_com_error err(hr);
-	const char* msg = reinterpret_cast<const char*>(err.ErrorMessage());
-
-	logging::Write(logging::Level::Error, context, msg);
+	std::string message = std::string(_bstr_t(_com_error(hr).ErrorMessage()));
+	logging::Write(logging::Level::Error, context, message.c_str());
 }
 

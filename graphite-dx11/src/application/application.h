@@ -21,8 +21,6 @@ private:
 	HINSTANCE m_instanceHandle;
 
 
-	void Update() { /* stub */ }
-	void Render() { /* stub */ }
-
-	void OnWindowResize(int width, int height) { /* stub */ }
+	void Update(float dt);
+	void Render(const FrameRenderContext& context);
 };
