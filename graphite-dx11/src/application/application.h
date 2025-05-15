@@ -2,6 +2,7 @@
 
 #include <memory>
 #include "window/window.h"
+#include "render/renderer.h"
 
 class Application
 {
@@ -14,7 +15,9 @@ public:
 
 private:
 	std::unique_ptr<Window> m_window;
+	std::unique_ptr<Renderer> m_renderer;
 	HINSTANCE m_instanceHandle;
+
 
 	void Update() { /* stub */ }
 	void Render() { /* stub */ }

@@ -1,5 +1,6 @@
 #include "application.h"
 #include "utils/errors.h"
+#include "render/dx11/d3d11_renderer.h"
 
 Application::Application(HINSTANCE hInstance)
 	: m_instanceHandle(hInstance) {}
@@ -16,8 +17,18 @@ bool Application::Initialize(int width, int height)
 	}
 
 	m_window->SetResizeCallback([this](int w, int h) {
-			OnWindowResize(w, h);
-		});
+		if (m_renderer)
+		{
+			m_renderer->Resize(w, h);
+		}
+	});
+
+	m_renderer = std::make_unique<D3D11Renderer>();
+	if (!m_renderer->Initialize(m_window->GetHandle(), width, height))
+	{
+		window::LogLastError("Renderer::Initialize");
+		return false;
+	}
 
 		//
 		// TO-DO
@@ -30,13 +41,25 @@ bool Application::Initialize(int width, int height)
 
 int Application::Run()
 {
+	// TODO
+	// ADD TIMER SYSTEM
+	FrameRenderContext frameContext;
+
 	while (true)
 	{
 		if (!m_window->ProcessMessages())
 			break;
 
-		Update();
-		Render();
+		frameContext.deltaTime = 1.0f / 60.0f; // stub
+		frameContext.windowWidth = m_window->GetWidth();
+		frameContext.windowHeight = m_window->GetHeight();
+
+		if (m_renderer)
+		{
+			m_renderer->RenderFrame(frameContext);
+		}
+
+		// future: Update();
 	}
 
 	return 0;
