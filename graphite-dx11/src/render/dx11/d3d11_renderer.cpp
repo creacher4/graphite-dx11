@@ -1,10 +1,44 @@
 #include "d3d11_renderer.h"
+#include "utils/errors.h"
 
 bool D3D11Renderer::Initialize(HWND hwnd, int width, int height)
 {
-	// TO-DO:
-	// initialize d3d11 device, swapchain, rtvs etc.
+	if (!CreateDeviceAndSwapchain(hwnd, width, height)) return false;
+	if (!CreateRenderTargetView()) return false;
 
+	SetViewport(width, height);
+	SetupRenderGraph();
+
+	return true;
+}
+
+void D3D11Renderer::RenderFrame(const FrameRenderContext& context)
+{
+	m_renderGraph.Execute(context);
+	m_swapChain->Present(1, 0);
+}
+
+void D3D11Renderer::Resize(int width, int height)
+{
+	if (m_context)
+	{
+		m_context->OMSetRenderTargets(0, nullptr, nullptr);
+	}
+	m_rtv.Reset();
+
+	HRESULT hr = m_swapChain->ResizeBuffers(0, width, height, DXGI_FORMAT_UNKNOWN, 0);
+	if (FAILED(hr))
+	{
+		d3d::LogIfFailed(hr, "ResizeBuffers");
+		return;
+	}
+
+	if (!CreateRenderTargetView()) return;
+	SetViewport(width, height);
+}
+
+bool D3D11Renderer::CreateDeviceAndSwapchain(HWND hwnd, int width, int height)
+{
 	DXGI_SWAP_CHAIN_DESC swapDesc = {};
 	swapDesc.BufferCount = 1;
 	swapDesc.BufferDesc.Width = width;
@@ -40,24 +74,35 @@ bool D3D11Renderer::Initialize(HWND hwnd, int width, int height)
 
 	if (FAILED(hr))
 	{
+		d3d::LogIfFailed(hr, "D3D11CreateDeviceAndSwapChain");
 		return false;
 	}
 
-	// get back buffer and create rtv
+	return true;
+}
+
+bool D3D11Renderer::CreateRenderTargetView()
+{
 	Microsoft::WRL::ComPtr<ID3D11Texture2D> backBuffer;
-	hr = m_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)backBuffer.GetAddressOf());
+	HRESULT hr = m_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)backBuffer.GetAddressOf());
 	if (FAILED(hr))
 	{
+		d3d::LogIfFailed(hr, "GetBuffer");
 		return false;
 	}
 
 	hr = m_device->CreateRenderTargetView(backBuffer.Get(), nullptr, &m_rtv);
 	if (FAILED(hr))
 	{
+		d3d::LogIfFailed(hr, "CreateRenderTargetView");
 		return false;
 	}
 
-	// set viewport
+	return true;
+}
+
+void D3D11Renderer::SetViewport(int width, int height)
+{
 	D3D11_VIEWPORT viewport = {};
 	viewport.Width = static_cast<float>(width);
 	viewport.Height = static_cast<float>(height);
@@ -65,50 +110,25 @@ bool D3D11Renderer::Initialize(HWND hwnd, int width, int height)
 	viewport.MaxDepth = 1.0f;
 	viewport.TopLeftX = 0.0f;
 	viewport.TopLeftY = 0.0f;
-	m_context->RSSetViewports(1, &viewport);
 
-	return true;
+	m_context->RSSetViewports(1, &viewport);
 }
 
-void D3D11Renderer::RenderFrame(const FrameRenderContext& context)
+void D3D11Renderer::SetupRenderGraph()
 {
-	// dummy frame
-	float clearColor[4] = { 0.1f, 0.1f, 0.3f, 1.0f };
-	m_context->OMSetRenderTargets(1, m_rtv.GetAddressOf(), nullptr);
-	m_context->ClearRenderTargetView(m_rtv.Get(), clearColor);
+	RenderPass clearPass;
+	clearPass.name = "ClearBackBuffer";
 
-	m_swapChain->Present(1, 0);
-}
-
-void D3D11Renderer::Resize(int width, int height)
-{
-	if (m_context) m_context->OMSetRenderTargets(0, nullptr, nullptr);
-	if (m_rtv) m_rtv.Reset();
-
-	HRESULT hr = m_swapChain->ResizeBuffers(0, width, height, DXGI_FORMAT_UNKNOWN, 0);
-	if (FAILED(hr))
+	clearPass.execute = [this](const FrameRenderContext&)
 	{
-		return;
-	}
+		float clearColor[4] = { 0.1f, 0.1f, 0.3f, 1.0f };
+		m_context->OMSetRenderTargets(1, m_rtv.GetAddressOf(), nullptr);
+		m_context->ClearRenderTargetView(m_rtv.Get(), clearColor);
+	};
 
-	Microsoft::WRL::ComPtr<ID3D11Texture2D> backBuffer;
-	hr = m_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)backBuffer.GetAddressOf());
-	if (FAILED(hr))
-	{
-		return;
-	}
+	clearPass.outputResources = {
+		{ "Backbuffer", AccessType::Write, ResourceType::Texture2D }
+	};
 
-	hr = m_device->CreateRenderTargetView(backBuffer.Get(), nullptr, &m_rtv);
-	if (FAILED(hr))
-	{
-		return;
-	}
-
-	// set new viewport
-	D3D11_VIEWPORT viewport = {};
-	viewport.Width = static_cast<float>(width);
-	viewport.Height = static_cast<float>(height);
-	viewport.MinDepth = 0.0f;
-	viewport.MaxDepth = 1.0f;
-	m_context->RSSetViewports(1, &viewport);
+	m_renderGraph.AddPass(clearPass);
 }

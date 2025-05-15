@@ -3,6 +3,7 @@
 #include <memory>
 #include "window/window.h"
 #include "render/renderer.h"
+#include "core/timer.h"
 
 class Application
 {
@@ -16,6 +17,7 @@ public:
 private:
 	std::unique_ptr<Window> m_window;
 	std::unique_ptr<Renderer> m_renderer;
+	Timer m_timer;
 	HINSTANCE m_instanceHandle;
 
 

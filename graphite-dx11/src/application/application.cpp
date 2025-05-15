@@ -30,27 +30,22 @@ bool Application::Initialize(int width, int height)
 		return false;
 	}
 
-		//
-		// TO-DO
-			// initialize renderer here
-			// pass window handle and window size
-			//
+	m_timer.Reset();
 
 	return true;
 }
 
 int Application::Run()
 {
-	// TODO
-	// ADD TIMER SYSTEM
-	FrameRenderContext frameContext;
-
 	while (true)
 	{
 		if (!m_window->ProcessMessages())
 			break;
 
-		frameContext.deltaTime = 1.0f / 60.0f; // stub
+		float dt = m_timer.GetDeltaTime();
+
+		FrameRenderContext frameContext;
+		frameContext.deltaTime = dt;
 		frameContext.windowWidth = m_window->GetWidth();
 		frameContext.windowHeight = m_window->GetHeight();
 

@@ -1,6 +1,6 @@
 #include "errors.h"
-#include <Windows.h>
 #include <string>
+#include <comdef.h>
 
 void logging::Write(Level level, const char* context, const char* message)
 {
@@ -59,5 +59,15 @@ void window::LogLastError(const char* context)
 void window::LogInfo(const char* context, const char* message)
 {
 	logging::Write(logging::Level::Info, context, message);
+}
+
+void d3d::LogIfFailed(HRESULT hr, const char* context)
+{
+	if (SUCCEEDED(hr)) return;
+
+	_com_error err(hr);
+	const char* msg = reinterpret_cast<const char*>(err.ErrorMessage());
+
+	logging::Write(logging::Level::Error, context, msg);
 }
 

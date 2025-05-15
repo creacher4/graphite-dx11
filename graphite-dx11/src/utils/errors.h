@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Windows.h>
+
 namespace logging
 {
 	enum class Level
@@ -17,4 +19,9 @@ namespace window
 {
     void LogLastError(const char* context);
 	void LogInfo(const char* context, const char* message);
+}
+
+namespace d3d
+{
+	void LogIfFailed(HRESULT hr, const char* context);
 }

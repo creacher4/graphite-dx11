@@ -34,6 +34,9 @@
     <Filter Include="Source Files\render\context">
       <UniqueIdentifier>{71af8d36-2699-4c46-9936-170146c58931}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\core">
+      <UniqueIdentifier>{b5ba6d1c-3d0a-4138-9aa1-186ba7a72e51}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -53,6 +56,9 @@
     </ClCompile>
     <ClCompile Include="src\render\dx11\d3d11_renderer.cpp">
       <Filter>Source Files\render\dx11</Filter>
+    </ClCompile>
+    <ClCompile Include="src\core\timer.cpp">
+      <Filter>Source Files\core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -76,6 +82,9 @@
     </ClInclude>
     <ClInclude Include="src\render\context\frame_render_context.h">
       <Filter>Source Files\render\context</Filter>
+    </ClInclude>
+    <ClInclude Include="src\core\timer.h">
+      <Filter>Source Files\core</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

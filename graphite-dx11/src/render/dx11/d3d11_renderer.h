@@ -16,12 +16,14 @@ public:
 private:
 	RenderGraph m_renderGraph;
 
-	//
-	// TO-DO
-	// add device, context, swapchain etc.
-
 	Microsoft::WRL::ComPtr<ID3D11Device> m_device;
 	Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_context;
 	Microsoft::WRL::ComPtr<IDXGISwapChain> m_swapChain;
 	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_rtv;
+
+	// helpers
+	bool CreateDeviceAndSwapchain(HWND hwnd, int width, int height);
+	bool CreateRenderTargetView();
+	void SetViewport(int width, int height);
+	void SetupRenderGraph();
 };
