@@ -12,3 +12,15 @@ void RenderGraph::Execute(const FrameRenderContext& context)
 		pass.execute(context);
 	}
 }
+
+void RenderGraph::RegisterExternalResource(const std::string& name, ID3D11RenderTargetView* rtv, ID3D11ShaderResourceView* srv)
+{
+	m_externalResources[name] = { rtv, srv };
+}
+
+ExternalResource RenderGraph::GetExternalResource(const std::string& name) const
+{
+	auto it = m_externalResources.find(name);
+	if (it != m_externalResources.end()) return it->second;
+	return {};
+}
