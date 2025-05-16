@@ -32,23 +32,20 @@ struct ResourceUsage
 	ResourceType type;
 };
 
-struct RenderPass
+struct RenderPassDesc
 {
 	std::string name;
 	std::function<void(const FrameRenderContext&)> execute;
-
 	std::vector<ResourceUsage> inputResources;
 	std::vector<ResourceUsage> outputResources;
 
-	//
-	// TO-DO
-		// add input/output/resources
+	// future metadata
 };
 
 class RenderGraph
 {
 public:
-	void AddPass(const RenderPass& pass);
+	void AddPass(const RenderPassDesc& pass);
 	void Compile();
 	void Execute(const FrameRenderContext& context);
 
@@ -59,7 +56,7 @@ public:
 	
 
 private:
-	std::vector<RenderPass> m_passes;
+	std::vector<RenderPassDesc> m_passes;
 	std::unordered_map<std::string, ExternalResource> m_externalResources;
 
 	//

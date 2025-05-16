@@ -1,6 +1,6 @@
 #include "render_graph.h"
 
-void RenderGraph::AddPass(const RenderPass& pass)
+void RenderGraph::AddPass(const RenderPassDesc& pass)
 {
 	m_passes.push_back(pass);
 }

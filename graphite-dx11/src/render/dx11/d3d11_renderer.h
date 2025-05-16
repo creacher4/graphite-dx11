@@ -48,4 +48,9 @@ private:
 
 	void CreateGBufferTextures(int width, int height);
 	void RegisterGBufferWithRenderGraph();
+
+	// passes
+	void AddClearBackBufferPass();
+	void AddGeometryPass();
+	void AddLightingPass();
 };

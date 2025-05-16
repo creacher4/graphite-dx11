@@ -52,9 +52,16 @@ void D3D11Renderer::SetViewport(int width, int height)
 
 void D3D11Renderer::SetupRenderGraph()
 {
-	RenderPass clearPass;
-	clearPass.name = "ClearBackBuffer";
-	clearPass.execute = [this](const FrameRenderContext& context)
+	AddClearBackBufferPass();
+	AddGeometryPass();
+	AddLightingPass();
+}
+
+void D3D11Renderer::AddClearBackBufferPass()
+{
+	RenderPassDesc desc;
+	desc.name = "ClearBackBuffer";
+	desc.execute = [this](const FrameRenderContext& context)
 		{
 			auto ctx = m_deviceManager->GetContext();
 			auto rtv = m_deviceManager->GetRenderTargetView();
@@ -63,17 +70,21 @@ void D3D11Renderer::SetupRenderGraph()
 			ctx->ClearRenderTargetView(rtv, context.clearColor);
 		};
 
-	clearPass.inputResources = {};
-	clearPass.outputResources = {
+	desc.inputResources = {};
+	desc.outputResources = {
 		{ "Backbuffer", AccessType::Write, ResourceType::Texture2D }
 	};
 
-	m_renderGraph.AddPass(clearPass);
+	m_renderGraph.AddPass(desc);
 
-	RenderPass geometryPass;
-	geometryPass.name = "GeometryPass";
+}
 
-	geometryPass.execute = [this](const FrameRenderContext& context)
+void D3D11Renderer::AddGeometryPass()
+{
+	RenderPassDesc desc;
+	desc.name = "GeometryPass";
+
+	desc.execute = [this](const FrameRenderContext& context)
 		{
 			auto ctx = m_deviceManager->GetContext();
 
@@ -103,26 +114,29 @@ void D3D11Renderer::SetupRenderGraph()
 
 		};
 
-	geometryPass.inputResources = {};
-	geometryPass.outputResources = {
+	desc.inputResources = {};
+	desc.outputResources = {
 		{ "Albedo", AccessType::Write, ResourceType::Texture2D },
 		{ "Normals", AccessType::Write, ResourceType::Texture2D }
 	};
 
-	m_renderGraph.AddPass(geometryPass);
+	m_renderGraph.AddPass(desc);
+}
 
-	RenderPass lightingPass;
-	lightingPass.name = "LightingPass";
+void D3D11Renderer::AddLightingPass()
+{
+	RenderPassDesc desc;
+	desc.name = "LightingPass";
 
-	lightingPass.inputResources = {
+	desc.inputResources = {
 		{ "Albedo", AccessType::Read, ResourceType::Texture2D },
 		{ "Normals", AccessType::Read, ResourceType::Texture2D }
 	};
-	lightingPass.outputResources = {
+	desc.outputResources = {
 		{ "Backbuffer", AccessType::Write, ResourceType::Texture2D }
 	};
 
-	lightingPass.execute = [this](const FrameRenderContext& context)
+	desc.execute = [this](const FrameRenderContext& context)
 		{
 			auto ctx = m_deviceManager->GetContext();
 			auto rtv = m_deviceManager->GetRenderTargetView();
@@ -151,8 +165,7 @@ void D3D11Renderer::SetupRenderGraph()
 			ctx->PSSetShaderResources(0, 2, nullSRV);
 		};
 
-	m_renderGraph.AddPass(lightingPass);
-
+	m_renderGraph.AddPass(desc);
 }
 
 void D3D11Renderer::CreateGBufferTextures(int width, int height)
