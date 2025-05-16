@@ -34,6 +34,11 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11InputLayout> m_inputLayout;
 	Microsoft::WRL::ComPtr<ID3D11Buffer> m_vertexBuffer;
 
+	Microsoft::WRL::ComPtr<ID3D11VertexShader> m_fullscreen_vs;
+	Microsoft::WRL::ComPtr<ID3D11PixelShader> m_lighting_ps;
+	Microsoft::WRL::ComPtr<ID3D11SamplerState> m_sampler;
+
+
 	bool LoadShaders();
 	bool CreateTriangleGeometry();
 

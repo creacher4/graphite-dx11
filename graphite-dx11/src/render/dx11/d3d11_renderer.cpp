@@ -31,6 +31,9 @@ void D3D11Renderer::Resize(int width, int height)
 {
 	m_deviceManager->Resize(width, height);
 	SetViewport(width, height);
+
+	CreateGBufferTextures(width, height);
+	RegisterGBufferWithRenderGraph();
 }
 
 void D3D11Renderer::SetViewport(int width, int height)
@@ -79,7 +82,11 @@ void D3D11Renderer::SetupRenderGraph()
 				m_renderGraph.GetExternalResource("Normals").rtv
 			};
 
-			ctx->OMSetRenderTargets(2, gbuffers, nullptr);
+			auto dsv = m_deviceManager->GetDepthStencilView();
+
+			ctx->OMSetRenderTargets(2, gbuffers, dsv);
+			ctx->ClearDepthStencilView(dsv, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+			ctx->OMSetDepthStencilState(m_deviceManager->GetDepthStencilState(), 0);
 
 			UINT stride = sizeof(Vertex);
 			UINT offset = 0;
@@ -103,6 +110,49 @@ void D3D11Renderer::SetupRenderGraph()
 	};
 
 	m_renderGraph.AddPass(geometryPass);
+
+	RenderPass lightingPass;
+	lightingPass.name = "LightingPass";
+
+	lightingPass.inputResources = {
+		{ "Albedo", AccessType::Read, ResourceType::Texture2D },
+		{ "Normals", AccessType::Read, ResourceType::Texture2D }
+	};
+	lightingPass.outputResources = {
+		{ "Backbuffer", AccessType::Write, ResourceType::Texture2D }
+	};
+
+	lightingPass.execute = [this](const FrameRenderContext& context)
+		{
+			auto ctx = m_deviceManager->GetContext();
+			auto rtv = m_deviceManager->GetRenderTargetView();
+
+			ctx->OMSetRenderTargets(1, &rtv, nullptr);
+
+			ID3D11ShaderResourceView* srvs[2] = {
+				m_renderGraph.GetExternalResource("Albedo").srv,
+				m_renderGraph.GetExternalResource("Normals").srv
+			};
+
+			ctx->VSSetShader(m_fullscreen_vs.Get(), nullptr, 0);
+			ctx->PSSetShader(m_lighting_ps.Get(), nullptr, 0);
+
+			ctx->PSSetShaderResources(0, 2, srvs);
+			ctx->PSSetSamplers(0, 1, m_sampler.GetAddressOf());
+
+			ctx->IASetInputLayout(nullptr);
+			ctx->IASetVertexBuffers(0, 0, nullptr, nullptr, nullptr);
+			ctx->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+			ctx->Draw(3, 0);
+
+			// then unbind srvs
+			ID3D11ShaderResourceView* nullSRV[2] = { nullptr, nullptr };
+			ctx->PSSetShaderResources(0, 2, nullSRV);
+		};
+
+	m_renderGraph.AddPass(lightingPass);
+
 }
 
 void D3D11Renderer::CreateGBufferTextures(int width, int height)
@@ -147,6 +197,8 @@ bool D3D11Renderer::LoadShaders()
 	Microsoft::WRL::ComPtr<ID3DBlob> psBlob;
 	auto device = m_deviceManager->GetDevice();
 
+
+	// geometry pass shaders
 	HRESULT hr = D3DReadFileToBlob(L"geometry_vs.cso", &vsBlob);
 	if (FAILED(hr)) 
 	{
@@ -164,19 +216,62 @@ bool D3D11Renderer::LoadShaders()
 	device->CreateVertexShader(vsBlob->GetBufferPointer(), vsBlob->GetBufferSize(), nullptr, &m_vs);
 	device->CreatePixelShader(psBlob->GetBufferPointer(), psBlob->GetBufferSize(), nullptr, &m_ps);
 
-	// input layout
+	// input layout for geometry pass
 	D3D11_INPUT_ELEMENT_DESC layout[] = {
 	{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0,                        D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	{ "NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT, 0, sizeof(DirectX::XMFLOAT3), D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
 
-	device->CreateInputLayout(
+	hr = device->CreateInputLayout(
 		layout,
 		ARRAYSIZE(layout),
 		vsBlob->GetBufferPointer(),
 		vsBlob->GetBufferSize(),
 		&m_inputLayout
 	);
+	if (FAILED(hr))
+	{
+		d3d::LogIfFailed(hr, "CreateInputLayout");
+		return false;
+	}
+
+	// lighting pass shaders
+	Microsoft::WRL::ComPtr<ID3DBlob> fullscreenVSBlob;
+	Microsoft::WRL::ComPtr<ID3DBlob> lightingPSBlob;
+
+	hr = D3DReadFileToBlob(L"fullscreen_quad_vs.cso", &fullscreenVSBlob);
+	if (FAILED(hr))
+	{
+		d3d::LogIfFailed(hr, "Load fullscreen_quad_vs.cso");
+		return false;
+	}
+
+	hr = D3DReadFileToBlob(L"lighting_ps.cso", &lightingPSBlob);
+	if (FAILED(hr))
+	{
+		d3d::LogIfFailed(hr, "Load lighting_ps.cso");
+		return false;
+	}
+
+	device->CreateVertexShader(fullscreenVSBlob->GetBufferPointer(), fullscreenVSBlob->GetBufferSize(), nullptr, &m_fullscreen_vs);
+	device->CreatePixelShader(lightingPSBlob->GetBufferPointer(), lightingPSBlob->GetBufferSize(), nullptr, &m_lighting_ps);
+
+	// create sampler for lighting pass
+	D3D11_SAMPLER_DESC sampDesc = {};
+	sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
+	sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+	sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
+	sampDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
+	sampDesc.MinLOD = 0;
+	sampDesc.MaxLOD = D3D11_FLOAT32_MAX;
+
+	hr = device->CreateSamplerState(&sampDesc, &m_sampler);
+	if (FAILED(hr))
+	{
+		d3d::LogIfFailed(hr, "CreateSamplerState");
+		return false;
+	}
 
 	return true;
 }

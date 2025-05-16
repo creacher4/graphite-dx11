@@ -5,6 +5,8 @@ bool D3D11Device::Initialize(HWND hwnd, int width, int height)
 {
 	if (!CreateDeviceAndSwapchain(hwnd, width, height)) return false;
 	if (!CreateBackBufferRTV()) return false;
+	if (!CreateDepthBuffer(width, height)) return false;
+	if (!CreateDepthStencilState()) return false;
 	return true;
 }
 
@@ -80,6 +82,8 @@ void D3D11Device::Resize(int width, int height)
 	}
 
     m_rtv.Reset();
+	m_dsv.Reset();
+	m_depthStencilBuffer.Reset();
 
 	HRESULT hr = m_swapChain->ResizeBuffers(0, width, height, DXGI_FORMAT_UNKNOWN, 0);
 	if (FAILED(hr))
@@ -89,4 +93,50 @@ void D3D11Device::Resize(int width, int height)
 	}
 
     CreateBackBufferRTV();
+	CreateDepthBuffer(width, height);
+}
+
+bool D3D11Device::CreateDepthBuffer(int width, int height)
+{
+    D3D11_TEXTURE2D_DESC desc = {};
+	desc.Width = width;
+	desc.Height = height;
+	desc.MipLevels = 1;
+	desc.ArraySize = 1;
+	desc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+	desc.SampleDesc.Count = 1;
+	desc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+
+	HRESULT hr = m_device->CreateTexture2D(&desc, nullptr, &m_depthStencilBuffer);
+	if (FAILED(hr))
+	{
+		d3d::LogIfFailed(hr, "CreateDepthBuffer");
+		return false;
+	}
+
+	hr = m_device->CreateDepthStencilView(m_depthStencilBuffer.Get(), nullptr, &m_dsv);
+	if (FAILED(hr))
+	{
+		d3d::LogIfFailed(hr, "CreateDepthStencilView");
+		return false;
+	}
+
+	return true;
+}
+
+bool D3D11Device::CreateDepthStencilState()
+{
+	D3D11_DEPTH_STENCIL_DESC desc = {};
+	desc.DepthEnable = TRUE;
+	desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+	desc.DepthFunc = D3D11_COMPARISON_LESS;
+
+	HRESULT hr = m_device->CreateDepthStencilState(&desc, &m_depthStencilState);
+	if (FAILED(hr))
+	{
+		d3d::LogIfFailed(hr, "CreateDepthStencilState");
+		return false;
+	}
+
+	return true;
 }
