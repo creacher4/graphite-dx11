@@ -52,7 +52,7 @@ public:
 	void Compile();
 	void Execute(const FrameRenderContext& context);
 
-	void RegisterExternalResource(const std::string& name, ID3D11RenderTargetView* rtv, ID3D11ShaderResourceView* srv);
+	void ImportResource(const std::string& name, ID3D11RenderTargetView* rtv, ID3D11ShaderResourceView* srv);
 
 
 	ExternalResource GetExternalResource(const std::string& name) const;

@@ -22,6 +22,7 @@
     <ClCompile Include="src\application\application.cpp" />
     <ClCompile Include="src\core\timer.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\render\dx11\d3d11_device.cpp" />
     <ClCompile Include="src\render\dx11\d3d11_renderer.cpp" />
     <ClCompile Include="src\render\graph\render_graph.cpp" />
     <ClCompile Include="src\utils\errors.cpp" />
@@ -32,6 +33,7 @@
     <ClInclude Include="src\core\timer.h" />
     <ClInclude Include="src\render\common\vertex.h" />
     <ClInclude Include="src\render\context\frame_render_context.h" />
+    <ClInclude Include="src\render\dx11\d3d11_device.h" />
     <ClInclude Include="src\render\dx11\d3d11_renderer.h" />
     <ClInclude Include="src\render\graph\render_graph.h" />
     <ClInclude Include="src\render\renderer.h" />

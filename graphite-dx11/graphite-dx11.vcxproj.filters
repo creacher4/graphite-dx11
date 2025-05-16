@@ -37,6 +37,12 @@
     <Filter Include="Source Files\core">
       <UniqueIdentifier>{b5ba6d1c-3d0a-4138-9aa1-186ba7a72e51}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\shaders">
+      <UniqueIdentifier>{3fb63064-f324-4a6e-b48c-3929e6d0b3d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\render\common">
+      <UniqueIdentifier>{0187568c-640d-4cb6-b727-043d436e4e0d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -59,6 +65,9 @@
     </ClCompile>
     <ClCompile Include="src\core\timer.cpp">
       <Filter>Source Files\core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\render\dx11\d3d11_device.cpp">
+      <Filter>Source Files\render\dx11</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -86,16 +95,19 @@
     <ClInclude Include="src\core\timer.h">
       <Filter>Source Files\core</Filter>
     </ClInclude>
+    <ClInclude Include="src\render\dx11\d3d11_device.h">
+      <Filter>Source Files\render\dx11</Filter>
+    </ClInclude>
     <ClInclude Include="src\render\common\vertex.h">
-      <Filter>Source Files\render</Filter>
+      <Filter>Source Files\render\common</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="src\shaders\geometry_vs.hlsl">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\shaders</Filter>
     </FxCompile>
     <FxCompile Include="src\shaders\geometry_ps.hlsl">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\shaders</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

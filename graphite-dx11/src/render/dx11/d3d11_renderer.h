@@ -2,8 +2,10 @@
 
 #include "render/renderer.h"
 #include "render/graph/render_graph.h"
+#include "d3d11_device.h"
 
 #include <d3d11.h>
+#include <memory>
 #include <wrl/client.h>
 
 struct GBufferTarget
@@ -24,10 +26,7 @@ private:
 	RenderGraph m_renderGraph;
 	std::unordered_map<std::string, GBufferTarget> m_gbuffer;
 
-	Microsoft::WRL::ComPtr<ID3D11Device> m_device;
-	Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_context;
-	Microsoft::WRL::ComPtr<IDXGISwapChain> m_swapChain;
-	Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_rtv;
+	std::unique_ptr<D3D11Device> m_deviceManager;
 
 	// shader stuff
 	Microsoft::WRL::ComPtr<ID3D11VertexShader> m_vs;
@@ -39,8 +38,6 @@ private:
 	bool CreateTriangleGeometry();
 
 	// helpers
-	bool CreateDeviceAndSwapchain(HWND hwnd, int width, int height);
-	bool CreateRenderTargetView();
 	void SetViewport(int width, int height);
 	void SetupRenderGraph();
 
